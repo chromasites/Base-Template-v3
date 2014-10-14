@@ -1,0 +1,23 @@
+body#tinymce.wp-editor {
+	color: #222;
+	font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+	font-size: 16px;
+	line-height: 24px;
+	max-width: 690px;
+}
+body#tinymce.wp-editor h1,
+body#tinymce.wp-editor h2,
+body#tinymce.wp-editor h3,
+body#tinymce.wp-editor h4,
+body#tinymce.wp-editor h5,
+body#tinymce.wp-editor h6,
+body#tinymce.wp-editor p,
+body#tinymce.wp-editor ul,
+body#tinymce.wp-editor ol,
+body#tinymce.wp-editor hr {
+	margin-bottom: 24px;
+	font-weight: 400;
+}
+body#tinymce.wp-editor div {
+	outline: 1px dotted #eee;
+}
