@@ -1,21 +1,25 @@
 <div class="post-meta row">	
 
-	<div class="byline col-xs-12">
-		By <?php the_author_posts_link(); ?>
+	<div class="col-sm-12">
+		<div class="byline"><span class="by">by </span><?php the_author_posts_link(); ?></div>
 	</div>
 	
-	<div class="datetime col-sm-12">
-		<span class="fa fa-clock-o"></span> <time><?php the_time('F jS, Y'); ?></time>
+	<div class="col-sm-8">
+		<div class="categories"><span class="fa fa-folder-open"></span> <?php the_category(', '); ?></div>
 	</div>
 	
-	<div class="categories col-xs-9">
-		<span class="fa fa-folder-open"></span> <?php the_category(', '); ?>
-	</div>
-	
-	<div class="comment-count col-sm-3">
+	<div class="col-sm-4 right-side">
+		
+		<span class="datetime">
+			<span class="fa fa-clock-o"></span> <time><?php the_time('F jS, Y'); ?></time>
+		</span>
+		
 		<?php if ( comments_open() ) { ?>
-		<span class="fa fa-comments"></span> <?php comments_popup_link( '0', '1', '%', 'comments-link', ''); ?>
+		<span class="comment-count">
+			<?php comments_popup_link( '<span class="fa fa-comments"></span>', '<span class="fa fa-comments"></span> 1', '<span class="fa fa-comments"></span> %', 'comments-link', ''); ?>
+		</span>
 		<?php } ?>
+		
 	</div>
 	
 </div>
