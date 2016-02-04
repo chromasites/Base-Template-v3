@@ -1,55 +1,45 @@
 <?php get_header(); ?>
 
-	<div id="main" class="container sidebar-right single-post">
+<div id="main" class="right-sidebar">
+	<div class="container">
+
 		<div class="row">
 		
 			<div class="col-md-8">
-				<div id="postwrapper">
+			
+				<div class="post-wrapper">
 				
 				<?php while ( have_posts() ) : the_post(); ?>
-				
+					
 					<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 					
-						<header class="post-header">
-						
+						<header class="post-heading">
 							<h1 class="post-title"><?php the_title(); ?></h1>
-							
 							<?php get_template_part( 'post-meta' ); ?>
-							
 						</header>
-						
-						<section class="post-content">
-						
-							<?php the_content('Read more&hellip;'); ?>
-							
+					
+						<section class="content">
+							<?php the_content(); ?>
 							<?php wp_link_pages( array(
 								'next_or_number'   => 'number',
-								'before'      => '<ul class="page-numbers"><li>Page:',
+								'before'      => '<ul class="page-numbers"><li>Page:</li><li>',
 								'separator'   => '</li><li>',
 								'after'       => '</li></ul>'
 							) ); ?>
-							
 						</section>
-						
-						<footer class="post-utility">
-							<div class="post-tags"><?php the_tags('<span class="hashtag">#</span>', '<span class="hashtag">#</span>', ''); ?></div>
-						</footer>
-						
-						<hr>
-						
-						<?php get_template_part( 'social-share-buttons' ); ?>
-						
-						<hr>
-						
-					</article>
 					
-					<div id="comments" class="post-comments">
-						<?php if ( comments_open() || get_comments_number() ) { comments_template( '', true ); } ?>
-					</div>
+						<?php the_tags('<footer class="post-utility"><div class="post-tags"><span class="fa fa-tags"></span>', '', '</div></footer>'); ?>
+					
+						<?php get_template_part( 'social-share-buttons' ); ?>
+					
+					</article>
+				
+					<?php if ( comments_open() || get_comments_number() ) { comments_template( '', true ); } ?>
 				
 				<?php endwhile; ?>
 				
-				</div>
+				</div><!-- .post-wrapper -->
+				
 			</div>
 			
 			<div class="col-md-4">
@@ -57,8 +47,10 @@
 					<?php get_sidebar(); ?>
 				</aside>
 			</div>
+			
+		</div><!-- .row -->
 		
-		</div>
-	</div>
+	</div><!-- .container -->
+</div><!-- #main -->
 
 <?php get_footer(); ?>

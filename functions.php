@@ -6,7 +6,7 @@ function chromasites_setup() {
 	add_editor_style( 'editor-style.css', 'assets/css/chroma-theme.min.css' );
 	register_nav_menus( array(
 		'primary' => 'Primary Menu',
-		'footer' => 'Footer Menu'
+		'mobile' => 'Mobile Menu'
 	) );
 }
 add_action( 'after_setup_theme', 'chromasites_setup' );
@@ -17,18 +17,18 @@ require_once('wp_bootstrap_navwalker.php');
 // Widgets & Sidebars
 function chromasites_custom_sidebars() {
 	register_sidebar( array(
-		'name' => __( 'Pages Sidebar', 'chromasites' ),
+		'name' => __( 'Sidebar', 'chromasites' ),
 		'id' => 'page-widget-area',
-		'description' => __( 'These widgets will only show on static pages that have a sidebar.', 'chromasites' ),
+		'description' => __( 'These widgets will appear on any page or post with a sidebar.', 'chromasites' ),
 		'before_widget' => '<div id="%1$s" class="widget %2$s">',
 		'after_widget' => "</div>",
 		'before_title' => '<h3 class="widget-title">',
 		'after_title' => '</h3>',
 	) );
 	register_sidebar( array(
-		'name' => __( 'Blog and Posts Sidebar', 'chromasites' ),
+		'name' => __( 'Blog Sidebar', 'chromasites' ),
 		'id' => 'blog-widget-area',
-		'description' => __( 'These widgets will only show in blog sections.', 'chromasites' ),
+		'description' => __( 'These widgets will appear below the page widgets on blog posts and archives.', 'chromasites' ),
 		'before_widget' => '<div id="%1$s" class="widget %2$s">',
 		'after_widget' => "</div>",
 		'before_title' => '<h3 class="widget-title">',
@@ -41,36 +41,41 @@ add_action( 'widgets_init', 'chromasites_custom_sidebars' );
 function load_cs_scripts() {
 	wp_enqueue_script('jquery');
 	wp_enqueue_script(
-		'jquery.bootstrap.min',
-		'//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js',
+		'jquery.bootstrap.js',
+		'//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js',
 		'jquery',
-		'3.1.1',
+		'3.3.2',
 		true
 	);
 	wp_enqueue_script(
-		'chroma-theme.js.min',
-		get_template_directory_uri() . '/assets/chroma-theme.min.js',
+		'chroma-theme.js',
+		get_template_directory_uri() . '/assets/js/chroma-theme.min.js',
 		'jquery',
-		'3.0.2',
-		true
-	);
-	wp_enqueue_script(
-		'colorbox',
-		'//cdnjs.cloudflare.com/ajax/libs/jquery.colorbox/1.4.3/jquery.colorbox-min.js',
-		'jquery',
-		'1.4.33',
+		'3.2.0',
 		true
 	);
 	wp_enqueue_style(
-		'chroma-theme.css.min',
-		get_template_directory_uri() . '/assets/css/chroma-theme.min.css',
+		'bootstrap.css',
+		'//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css',
 		array(),
-		'3.0.2'
+		'3.3.2'
+	);
+	wp_enqueue_style(
+		'chroma-theme.css',
+		get_template_directory_uri() . '/assets/css/chroma-theme.css',
+		array(),
+		'3.1'
+	);
+	wp_enqueue_style(
+		'font-awesome.css',
+		'//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css',
+		array(),
+		'4.3.0'
 	);
 	wp_enqueue_style(
 		'chromasites-style',
 		 get_stylesheet_uri(),
-		 'chroma-theme.css.min'
+		 'chroma-theme.css'
 	);
 }
 add_action( 'wp_enqueue_scripts', 'load_cs_scripts' );
@@ -117,17 +122,6 @@ function is_subpage( $page = null ) {
     }
 }
 
-// Chroma Sites Customized Admin Menus
-function custom_admin_menu_area () {
-	if ( function_exists( 'remove_menu_page' ) ) {
-//	remove_menu_page('edit-comments.php');
-//	remove_menu_page('edit.php');
-	} else {
-	unset( $GLOBALS['menu'][25] );
-	}
-}
-add_action( 'admin_menu', 'custom_admin_menu_area' );
-
 // Display Specific Page Content Within a Template
 function display_page_content ($page_id) {
   $post = get_page($page_id);
@@ -143,7 +137,7 @@ function custom_toolbar() {
 	global $wp_admin_bar;
 	$args = array(
 		'id'     => 'chromasites_link',
-		'title'  => __( 'Go to ChromaSites.com', 'text_domain' ),
+		'title'  => __( 'ChromaSites.com', 'text_domain' ),
 		'href'   => 'http://www.chromasites.com',
 		'meta'   => array(
 			'target'   => '_blank',
@@ -155,43 +149,71 @@ function custom_toolbar() {
 add_action( 'wp_before_admin_bar_render', 'custom_toolbar', 999 );
 
 // Customizer Options
-function chromasites_theme_customizer( $wp_customize ) {
-	// Logo Uploader
-    $wp_customize->add_section( 'chromasites_logo_section' , array(
-        'title'       => __( 'Logo', 'chromasites_setup' ),
-        'priority'    => 30,
-        'description' => 'Upload a logo to replace the default Chroma Sites logo.',
-    ) );
-    $wp_customize->add_setting( 'chromasites_upload_logo' );
-    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'chromasites_upload_logo', array(
-        'label'    => __( 'Logo', 'chromasites_setup' ),
-        'section'  => 'chromasites_logo_section',
-        'settings' => 'chromasites_upload_logo',
-    ) ) );
-
-	// Layout Chooser
+function chromasites_theme_customizer( $wp_customize ) {    
+    // Layout Chooser
     $wp_customize->add_section( 'chromasites_layout_section' , array(
-        'title'       => __( 'Layout', 'chromasites_setup' ),
+        'title'       => __( 'Layout & Logo', 'chromasites_setup' ),
         'priority'    => 35,
         'description' => 'Choose your preferred design layout.',
     ) );
-    $wp_customize->add_setting( 'chromasites_layout_option' );
-    $wp_customize->add_control( 'chromasites_layout_option', array(
+    $wp_customize->add_setting( 'cs_layout' );
+    $wp_customize->add_control( 'cs_layout', array(
         'type' => 'radio',
-        'label'    => __( 'Choose a Layout Option', 'chromasites_setup' ),
+        'label'    => __( 'Choose a Layout Style', 'chromasites_setup' ),
         'section'  => 'chromasites_layout_section',
-        'settings' => 'chromasites_layout_option',
+        'settings' => 'cs_layout',
         'choices'    => array(
             'walltowall' => 'Wall-to-Wall',
             'centerstage' => 'Center Stage',
             'letterhead' => 'Letterhead',
+            'compact' => 'Compact',
         ),
+    ) );
+    function is_compact_layout() {
+        return get_theme_mod('cs_layout') == 'compact';
+    }
+    $wp_customize->add_setting( 'cs_fixed_menu' );
+    $wp_customize->add_control( 'cs_fixed_menu', array(
+        'type' => 'checkbox',
+        'label'    => __( 'Fix navbar to top.', 'chromasites_setup' ),
+        'section'  => 'chromasites_layout_section',
+        'settings' => 'cs_fixed_menu',
+        'active_callback' => 'is_compact_layout',
+    ) );
+    
+    // Navigation Style
+    $wp_customize->add_setting( 'cs_nav_style' );
+    $wp_customize->add_control( 'cs_nav_style', array(
+        'type' => 'radio',
+        'label'    => __( 'Choose a Navigation Style', 'chromasites_setup' ),
+        'section'  => 'chromasites_layout_section',
+        'settings' => 'cs_nav_style',
+        'choices'    => array(
+            'text-nav' => 'Plain Text',
+            'bar-nav' => 'Bar Navigation',
+            'button-nav' => 'Button Navigation',
+        ),
+    ) );
+    
+    // Logo Uploader & Text Logo
+    $wp_customize->add_setting( 'chromasites_upload_logo' );
+    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'chromasites_upload_logo', array(
+        'label'    => __( 'Logo', 'chromasites_setup' ),
+        'section'  => 'chromasites_layout_section',
+        'settings' => 'chromasites_upload_logo',
+    ) ) );
+    $wp_customize->add_setting( 'chromasites_use_text_logo' );
+    $wp_customize->add_control( 'chromasites_use_text_logo', array(
+        'type' => 'checkbox',
+        'label'    => __( 'Use text as your logo instead of an image.', 'chromasites_setup' ),
+        'section'  => 'chromasites_layout_section',
+        'settings' => 'chromasites_use_text_logo',
     ) );
 
 	// Disable Blog
     $wp_customize->add_section( 'chromasites_blogging_section' , array(
         'title'       => __( 'Blogging', 'chromasites_setup' ),
-        'priority'    => 40,
+        'priority'    => 47,
         'description' => 'Disable all blogging features within the admin area.',
     ) );
     $wp_customize->add_setting( 'chromasites_hide_blog_features' );
@@ -218,9 +240,20 @@ function chromasites_theme_customizer( $wp_customize ) {
 }
 add_action('customize_register', 'chromasites_theme_customizer');
 
+// Choose which logo to use
+function site_logo() {
+	if ( get_theme_mod( 'chromasites_use_text_logo' ) == 'checked') :
+		echo '<span class="text-logo">'; echo bloginfo( 'name' ); echo '</span>';
+	elseif ( get_theme_mod( 'chromasites_upload_logo' ) ) :
+		echo '<img itemprop="logo" src="'; echo esc_url( get_theme_mod( 'chromasites_upload_logo' ) ); echo '" alt="'; echo bloginfo('name'); echo '"/>';
+	else :
+		echo '<img src="' . get_stylesheet_directory_uri() . '/images/chromasites-wp-logo.png" />';
+	endif;
+}
+
 // Function to Hide Blogging Features in Admin
 if( get_theme_mod( 'chromasites_hide_blog_features' ) == 'checked') {
-	function custom_admin_menu_area () {
+	function chromasites_hide_blog_menus () {
 		if ( function_exists( 'remove_menu_page' ) ) {
 			remove_menu_page('edit-comments.php');
 			remove_menu_page('edit.php');
@@ -228,7 +261,7 @@ if( get_theme_mod( 'chromasites_hide_blog_features' ) == 'checked') {
 			unset( $GLOBALS['menu'][25] );
 		}
 	}
-	add_action( 'admin_menu', 'custom_admin_menu_area' );
+	add_action( 'admin_menu', 'chromasites_hide_blog_menus' );
 }
 
 // Function to Disable File Editing in Admin
@@ -236,31 +269,5 @@ if( get_theme_mod( 'chromasites_allow_file_editor' ) != 'checked') {
 	define('DISALLOW_FILE_EDIT',true);
 }
 
-// Shortcode to insert content of a page by ID [insertpage page="2"]
-function shortcode_insert_page_content($atts, $content = null) {
-	$output = NULL;
-	extract(shortcode_atts(array(
- 		"page" => ''
-	), $atts));
-
-	if (!empty($page)) {
-		$pageContent = new WP_query();
-		$pageContent->query(array('page_id' => $page));
-		while ($pageContent->have_posts()) : $pageContent->the_post();
-			$output = apply_filters( 'the_content', get_the_content() );
-		endwhile;
-	}
-	return $output;
-}
-add_shortcode('insertpage', 'shortcode_insert_page_content');
-
-// Temporary All-In-One-SEO Pack Custom Post Type Titles Fix
-add_filter( 'aioseop_title', 'mf_rewrite_custom_titles' );
-function mf_rewrite_custom_titles( $title ) {
-    if ( is_post_type_archive() ) {
-        $post_type = get_post_type_object( get_post_type() );
-        $blog_title = get_bloginfo();
-        $title = $post_type->labels->name . " | " . $blog_title;
-    }
-    return $title;
-}
+// Load Chroma Sites Theme Options, Layouts and Settings Pages
+get_template_part( 'custom-theme-settings' );
